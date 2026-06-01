@@ -5,11 +5,11 @@ import { History, Pencil, RotateCcw, Trash2, X } from 'lucide-react'
 import { CHECKER_STATUSES, STATUS_CONFIG } from '@/lib/constants'
 import { deleteCommitment } from '@/lib/actions'
 import { createClient } from '@/lib/supabase/client'
-import type { Commitment, CommitmentEvent, Status } from '@/lib/types'
+import type { Commitment, CommitmentEvent, Profile, Status } from '@/lib/types'
 
 interface Props {
   commitment: Commitment
-  isAdmin: boolean
+  currentProfile: Profile
   onClose: () => void
   onEdit: (c: Commitment) => void
   onDelete: (id: string) => void
@@ -35,9 +35,12 @@ function MetaItem({ label, value }: { label: string; value: React.ReactNode }) {
   )
 }
 
-export default function DetailModal({ commitment: c, isAdmin, onClose, onEdit, onDelete, onStatusChange, onReturn }: Props) {
+export default function DetailModal({ commitment: c, currentProfile, onClose, onEdit, onDelete, onStatusChange, onReturn }: Props) {
   const s = STATUS_CONFIG[c.status]
   const Icon = s.icon
+
+  // only the ASSIGNED checker (or super) may manage this commitment
+  const canManage = currentProfile.role === 'admin' && (c.checker_id === currentProfile.id || !!currentProfile.is_super)
 
   const [returnOpen, setReturnOpen] = useState(false)
   const [reason, setReason] = useState('')
@@ -68,7 +71,7 @@ export default function DetailModal({ commitment: c, isAdmin, onClose, onEdit, o
 
   // checker can return a commit that's awaiting check (or already expired) back to the executor.
   // requires an assigned executor — otherwise the commit would land in nobody's board.
-  const canReturn = isAdmin && !!onReturn && !!c.executor_id && (c.status === 'to_check' || c.status === 'expired')
+  const canReturn = canManage && !!onReturn && !!c.executor_id && (c.status === 'to_check' || c.status === 'expired')
 
   const handleDelete = async () => {
     onDelete(c.id)
@@ -108,7 +111,7 @@ export default function DetailModal({ commitment: c, isAdmin, onClose, onEdit, o
             } />
           </div>
 
-          {isAdmin && (
+          {canManage && (
             <>
               <div className="sc-detail-label" style={{ marginBottom: 8 }}>Змінити статус</div>
               <div className="sc-status-btns">
@@ -172,7 +175,7 @@ export default function DetailModal({ commitment: c, isAdmin, onClose, onEdit, o
           )}
 
           <div className="sc-modal-actions">
-            {isAdmin && (
+            {canManage && (
               <button className="sc-btn sc-btn-danger" onClick={handleDelete}>
                 <Trash2 size={14} /> Видалити
               </button>
@@ -183,7 +186,7 @@ export default function DetailModal({ commitment: c, isAdmin, onClose, onEdit, o
               </button>
             )}
             <button className="sc-btn sc-btn-secondary" onClick={onClose}>Закрити</button>
-            {isAdmin && (
+            {canManage && (
               <button className="sc-btn sc-btn-primary" onClick={() => onEdit(c)}>
                 <Pencil size={14} /> Редагувати
               </button>

@@ -296,7 +296,7 @@ export default function AppShell({ currentProfile, initialCommitments, projects,
       {detailTarget && (
         <DetailModal
           commitment={detailTarget}
-          isAdmin={isAdmin}
+          currentProfile={currentProfile}
           onClose={() => setDetailTarget(null)}
           onEdit={c => { setDetailTarget(null); setEditTarget(c) }}
           onDelete={handleDeleted}

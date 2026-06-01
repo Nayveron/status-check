@@ -26,8 +26,7 @@ export default function Sidebar({ currentProfile, viewMode, onViewChange, myActi
         { id: 'admin',     label: 'Команда',   icon: Users },
       ]
     : [
-        { id: 'tasks',    label: 'Мої завдання', icon: LayoutList, badge: myActiveCount || undefined },
-        { id: 'calendar', label: 'Календар',     icon: Calendar },
+        { id: 'tasks', label: 'Мої завдання', icon: LayoutList, badge: myActiveCount || undefined },
       ]
 
   // ── physical slider caret ──

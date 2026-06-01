@@ -49,47 +49,42 @@ export default function CalendarView({
   const [viewYear, setViewYear] = useState(effectiveToday.getFullYear())
   const [viewMonth, setViewMonth] = useState(effectiveToday.getMonth())
   const [filterProject, setFilterProject] = useState('')
-  const [filterChecker, setFilterChecker] = useState('')
   const [filterStatus, setFilterStatus] = useState<Status | ''>('')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   const days = useMemo(() => getDaysInMonth(viewYear, viewMonth), [viewYear, viewMonth])
 
-  // overdue to_check shown as expired right away (respects the demo/mock "today")
+  // a checker sees ONLY commitments assigned to them; overdue to_check shown as expired
   const effCommitments = useMemo(
-    () => commitments.map(c => {
-      const s = effectiveStatus(c, effectiveToday)
-      return s === c.status ? c : { ...c, status: s }
-    }),
-    [commitments, effectiveToday]
+    () => commitments
+      .filter(c => c.checker_id === currentProfile.id)
+      .map(c => {
+        const s = effectiveStatus(c, effectiveToday)
+        return s === c.status ? c : { ...c, status: s }
+      }),
+    [commitments, effectiveToday, currentProfile.id]
   )
 
   const q = searchQuery.trim().toLowerCase()
   const filtered = useMemo(() => effCommitments.filter(c => {
     if (!CHECKER_STATUSES.includes(c.status)) return false
     if (filterProject && c.project_id !== filterProject) return false
-    if (filterChecker && c.checker_id !== filterChecker) return false
     if (filterStatus && c.status !== filterStatus) return false
     if (q && !c.title.toLowerCase().includes(q)) return false
     return true
-  }), [effCommitments, filterProject, filterChecker, filterStatus, q])
+  }), [effCommitments, filterProject, filterStatus, q])
 
   // stats ignore the status filter (so the bar always shows full counts)
   const statsBase = useMemo(() => effCommitments.filter(c => {
     if (!CHECKER_STATUSES.includes(c.status)) return false
     if (filterProject && c.project_id !== filterProject) return false
-    if (filterChecker && c.checker_id !== filterChecker) return false
     if (q && !c.title.toLowerCase().includes(q)) return false
     return true
-  }), [effCommitments, filterProject, filterChecker, q])
+  }), [effCommitments, filterProject, q])
 
   const projectOptions = useMemo(
     () => [{ value: '', label: 'Всі проєкти' }, ...projects.map(p => ({ value: p.id, label: p.name }))],
     [projects]
-  )
-  const checkerOptions = useMemo(
-    () => [{ value: '', label: 'Всі перевіряючі' }, ...profiles.filter(p => p.role === 'admin').map(p => ({ value: p.id, label: p.name }))],
-    [profiles]
   )
 
   const stats = useMemo(() => {
@@ -129,7 +124,6 @@ export default function CalendarView({
         </div>
         <div className="sc-toolbar-right">
           <Dropdown value={filterProject} options={projectOptions} onChange={setFilterProject} placeholder="Всі проєкти" />
-          <Dropdown value={filterChecker} options={checkerOptions} onChange={setFilterChecker} placeholder="Всі перевіряючі" minWidth={190} />
         </div>
       </div>
 

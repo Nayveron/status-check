@@ -169,11 +169,17 @@ CREATE POLICY "projects_all_admin" ON projects FOR ALL TO authenticated
 -- commitments
 DROP POLICY IF EXISTS "commitments_select"           ON commitments;
 DROP POLICY IF EXISTS "commitments_admin_all"        ON commitments;
+DROP POLICY IF EXISTS "commitments_checker_update"   ON commitments;
+DROP POLICY IF EXISTS "commitments_checker_delete"   ON commitments;
 DROP POLICY IF EXISTS "commitments_executor_insert"  ON commitments;
 DROP POLICY IF EXISTS "commitments_executor_update"  ON commitments;
 CREATE POLICY "commitments_select" ON commitments FOR SELECT TO authenticated USING (true);
-CREATE POLICY "commitments_admin_all" ON commitments FOR ALL TO authenticated
-  USING (public.is_admin()) WITH CHECK (public.is_admin());
+-- only the ASSIGNED checker (or super) manages a commitment's status/fields & can delete it
+CREATE POLICY "commitments_checker_update" ON commitments FOR UPDATE TO authenticated
+  USING (checker_id = auth.uid() OR public.is_super())
+  WITH CHECK (checker_id = auth.uid() OR public.is_super());
+CREATE POLICY "commitments_checker_delete" ON commitments FOR DELETE TO authenticated
+  USING (checker_id = auth.uid() OR public.is_super());
 -- executors create tasks for themselves OR into the shared pool (executor_id NULL)
 CREATE POLICY "commitments_executor_insert" ON commitments FOR INSERT TO authenticated
   WITH CHECK (executor_id = auth.uid() OR executor_id IS NULL);
