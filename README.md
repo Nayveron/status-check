@@ -27,6 +27,6 @@ A web application for **tracking team deadlines and commitments**: a hybrid of a
 npm install
 cp .env.local.example .env.local   # fill in NEXT_PUBLIC_SUPABASE_URL / ANON_KEY
 npm run dev
-
+```
 ##  Database
 See supabase/README.md: execute supabase/setup.sql (full database schema), optionally run supabase/seed.sql (demo/mock data), and assign the Super-Verifier role.
