@@ -1,35 +1,32 @@
 # Status Check
 
-Веб-застосунок для **відстеження дедлайнів і комітментів** команди: гібрид календаря та
-таск-трекера, де задача — це не «зробити», а **проконтролювати виконання іншою людиною**.
+A web application for **tracking team deadlines and commitments**: a hybrid of a calendar and a task tracker, where a task is not just about "doing" something, but rather **monitoring and verifying completion by another person**.
 
-🔗 **Демо:** https://status-check-ten.vercel.app
+🔗 **Demo:** https://status-check-ten.vercel.app
 
-## Стек
-- **TypeScript** + **React 19** (компоненти у `.tsx`)
+## Tech Stack
+- **TypeScript** + **React 19** (components in `.tsx`)
 - **Next.js 16** (App Router, Server Actions)
 - **Supabase** — Auth, PostgreSQL, RLS, Realtime
-- **Recharts** — аналітика
-- **Vercel** — хостинг
+- **Recharts** — analytics & charts
+- **Vercel** — hosting
 
-## Можливості
-- Авторизація з підтвердженням email і скиданням пароля
-- Дві ролі + супер-перевіряючий (ієрархія прав на рівні БД через RLS)
-- Спільний пул задач зі скоупінгом за проєктом, атомарний «claim»
-- Дошка виконавця (drag&drop) → відправка комітменту на перевірку
-- Календар перевіряючого, повернення на доопрацювання, авто-просрочка
-- Realtime-синхронізація між користувачами
-- Аналітика (статуси, дедлайни, рейтинг виконавців, динаміка)
-- Адмін-панель: команда, ролі, проєкти з учасниками
-- Лог активності на комітменті
+## Features
+- Authentication with email verification and password reset
+- Two-tier role system + Super-Verifier (hierarchical permissions at the DB level via RLS)
+- Shared task pool with project scoping and atomic task "claiming"
+- Assignee/Doer board (drag & drop) → submitting commitments for review
+- Verifier calendar, returning tasks for rework, and automated status updates for overdue tasks
+- Real-time data synchronization between users
+- Analytics & Insights (task statuses, deadlines, assignee leaderboard, and dynamics)
+- Admin Panel: team management, roles, and projects with designated members
+- Comprehensive activity log for each commitment
 
-## Запуск локально
+## Local Setup
 ```bash
 npm install
-cp .env.local.example .env.local   # заповни NEXT_PUBLIC_SUPABASE_URL / ANON_KEY
+cp .env.local.example .env.local   # fill in NEXT_PUBLIC_SUPABASE_URL / ANON_KEY
 npm run dev
-```
 
-## База даних
-Див. [`supabase/README.md`](supabase/README.md): прогнати `supabase/setup.sql`
-(повна схема), за бажанням `supabase/seed.sql` (демо-дані), призначити супер-перевіряючого.
+##  Database
+See supabase/README.md: execute supabase/setup.sql (full database schema), optionally run supabase/seed.sql (demo/mock data), and assign the Super-Verifier role.
